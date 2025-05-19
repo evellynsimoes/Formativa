@@ -1,0 +1,40 @@
+.conteiner{
+    display: flex;
+    justify-content: center;
+    height: 40px;
+    background-color: #0a5da5;
+}
+
+ul{
+    list-style: none;
+    margin-right: 20px;
+    padding: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    margin: 4px 4px 4px;
+    color: rgba(236, 233, 228);
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 8px;
+    transition: all 0.3s ease; 
+    cursor: pointer;
+}
+
+li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  
+}
+
+li.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}

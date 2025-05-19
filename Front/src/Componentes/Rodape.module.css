@@ -1,0 +1,51 @@
+.conteiner {
+    background-color: #0a5da5;
+    color: white;
+    padding: 20px 10px;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+.topo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.icone {
+    width: 40px;
+    height: auto;
+}
+
+.slogan {
+    font-size: 18px;
+    margin: 0;
+    color: white;
+}
+
+.links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.links li{
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.links li:hover {
+    color: #ffffff;
+    transition: color 0.3s ease-in-out;
+}
+
+.direitos {
+    font-size: 12px;
+    opacity: 0.8;
+}

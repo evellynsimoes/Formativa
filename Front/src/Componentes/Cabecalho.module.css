@@ -1,0 +1,27 @@
+.conteudo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.conteiner{
+    background-color: #000000;
+    height: 100px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+h1{
+    color: #1E88E5;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    font-size: 50px;
+    display: flex;
+}
+
+.icone {
+    width: 55px;
+    height: 55px;
+    margin-right: 10px;
+}
