@@ -4,6 +4,10 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { FloatLabel } from 'primereact/floatlabel';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+
 
 import estilo from './ConteudoLogin.module.css';
 import imagemLogin from '../assets/imagem-login.jpg';
@@ -31,7 +35,7 @@ export function ConteudoLogin() {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('token', data.access);
                 localStorage.setItem('refresh_token', data.refresh);
                 navigate('/');
             } else {
@@ -55,6 +59,7 @@ export function ConteudoLogin() {
                                     id="usuario"
                                     value={usuario}
                                     onChange={(e) => setUsuario(e.target.value)}
+                                    placeholder=" "
                                 />
                                 <label htmlFor="usuario">Usuário</label>
                             </FloatLabel>
@@ -67,6 +72,7 @@ export function ConteudoLogin() {
                                     value={senha}
                                     onChange={(e) => setSenha(e.target.value)}
                                     feedback={false}
+                                    placeholder=" "
                                 />
                                 <label htmlFor="senha">Senha</label>
                             </FloatLabel>

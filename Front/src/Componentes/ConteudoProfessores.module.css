@@ -1,0 +1,248 @@
+.conteudo {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+}
+
+.containerTabela {
+    width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+}
+
+.tabela {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+.tabela thead {
+    background-color: #3f51b5;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+.tabela th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tabela tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.tabela tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tabela tbody tr:hover {
+    background-color: #f5f5ff;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(63, 81, 181, 0.1);
+}
+
+.tabela td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    color: #333;
+    font-size: 14px;
+}
+
+.tabela td:last-child {
+    text-align: center;
+    width: 120px;
+}
+
+.icones {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.iconeAcao {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.iconeAcao:hover {
+    opacity: 1;
+    transform: scale(1.15);
+    background-color: rgba(63, 81, 181, 0.1);
+}
+
+
+.tabela tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.botao {
+    display: flex;
+    justify-content: flex-end;
+    margin: 20px 20px 10px 20px;
+}
+
+.botao button {
+    background-color: #3f51b5;
+    color: white;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.botao button:hover {
+    background-color: #303f9f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.2);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modalContent {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 450px;
+    max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalContent h2 {
+    color: #3f51b5;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.modalContent input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border 0.3s;
+}
+
+.modalContent input:focus {
+    border-color: #3f51b5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+.botoes {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cadastrar, .fechar {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cadastrar {
+    background: #4caf50;
+    color: white;
+}
+
+.cadastrar:hover {
+    background: #388e3c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+}
+
+.fechar {
+    background: #f44336;
+    color: white;
+}
+
+.fechar:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.2);
+}
+
+/* Loading state */
+.erro {
+    color: #f44336;
+    background: #ffebee;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 0 20px 20px 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .containerTabela {
+        width: 100%;
+        padding: 10px;
+        border-radius: 0;
+    }
+    
+    .tabela th, .tabela td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+    
+    .modalContent {
+        width: 90%;
+        padding: 20px;
+    }
+}

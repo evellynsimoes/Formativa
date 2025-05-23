@@ -3,6 +3,7 @@ import professor from '../assets/professor.png'
 import book from '../assets/book.png'
 import ambiente from '../assets/ambiente.png'
 import boss from '../assets/boss.png'
+import { Link } from 'react-router-dom'
 
 export function Menu(){
     return(
@@ -12,13 +13,14 @@ export function Menu(){
                     <td>
                         <div className={estilo.item}>
                             <img src={professor} alt="Ícone de professor" className={estilo.icone}/>
-                            Professores
+                            <Link to="/professores" style={{ textDecoration: 'none',  color: 'inherit' }}>Professores</Link>
+                            
                         </div>
                     </td>
                     <td>
                         <div className={estilo.item}>
                             <img src={boss} alt="Ícone de chefe" className={estilo.icone}/>
-                            Gestores
+                            <Link to="/professores" style={{ textDecoration: 'none',  color: 'inherit' }}>Gestores</Link>
                         </div>
                     </td>
                 </tr>
@@ -26,13 +28,13 @@ export function Menu(){
                     <td>
                         <div className={estilo.item}>
                             <img src={book} alt="Ícone de disciplina" className={estilo.icone}/>
-                            Disciplinas
+                            <Link to="/professores" style={{ textDecoration: 'none',  color: 'inherit' }}>Disciplinas</Link>
                         </div>
                     </td>
                     <td>
                         <div className={estilo.item}>
                             <img src={ambiente} alt="Ícone de ambiente" className={estilo.icone}/>
-                            Ambientes
+                            <Link to="/professores" style={{ textDecoration: 'none',  color: 'inherit' }}>Ambientes</Link>
                         </div>
                     </td>
                 </tr>

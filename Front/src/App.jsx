@@ -1,7 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { PrimeReactProvider } from 'primereact/api';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
 import { Home } from './Pages/Home';
 import { Login } from './Pages/Login';
+import { Professores } from './Pages/Professores';
 
 function App() {
   return (
@@ -9,7 +13,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />}/>
+          <Route path="/professores" element={<Professores/>}/>
         </Routes>
       </Router>
     </PrimeReactProvider>
