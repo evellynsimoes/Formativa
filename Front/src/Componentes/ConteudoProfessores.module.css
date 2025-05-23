@@ -1,50 +1,51 @@
 .conteudo {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins' sans-serif;
     padding: 20px;
     background-color: #f5f7fa;
-    min-height: 100vh;
 }
 
 .containerTabela {
-    width: 95%;
+    width: 50%;
     margin: 20px auto;
-    padding: 20px;
     background-color: #fff;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.24);
     overflow-x: auto;
 }
 
 .tabela {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: auto;
+    table-layout: fixed;
+}
+
+.tituloTabela{
+    display:  flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .tabela thead {
     background-color: #3f51b5;
     color: white;
-    position: sticky;
     top: 0;
+    left: 0;
+    position: relative;
 }
 
+
 .tabela th {
-    padding: 16px;
+    padding: 22px;
     text-align: left;
     font-weight: 600;
     font-size: 15px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .tabela tbody tr {
     transition: all 0.2s ease;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.tabela tbody tr:last-child {
-    border-bottom: none;
+    border-bottom: 1px solid #9c9c9c;
+    display: table;
 }
 
 .tabela tbody tr:hover {
@@ -54,15 +55,15 @@
 }
 
 .tabela td {
-    padding: 14px 16px;
-    vertical-align: middle;
     color: #333;
     font-size: 14px;
+    display: table-cell;
 }
 
-.tabela td:last-child {
-    text-align: center;
-    width: 120px;
+.tabela th, .tabela td{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .icones {

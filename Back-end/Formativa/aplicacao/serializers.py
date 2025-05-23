@@ -5,7 +5,9 @@ from django.contrib.auth import authenticate
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = '__all__'
+        fields = ['NI', 'data_contratacao', 'data_nascimento', 'email', 'escolha', 'id', 'nome','password', 'telefone', 'username']
+
+
 
     def create(self, validated_data):
         user = Usuario.objects.create_user(
@@ -22,7 +24,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
-
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if password:

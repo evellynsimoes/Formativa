@@ -16,8 +16,8 @@ export function ConteudoProfessores() {
         NI: '',
         password: '',
         escolha: 'P',
-        data_nascimento: '2000-01-01',
-        data_contratacao: '2023-01-01'
+        data_nascimento: '',
+        data_contratacao: ''
     });
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,14 +35,14 @@ export function ConteudoProfessores() {
             if (!token) {
                 throw new Error('Token não encontrado');
             }
-    
+
             const response = await axios.get(API_URL, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             console.log("DADOS RECEBIDOS:", response.data);
             setProfessores(response.data);
         } catch (error) {
@@ -90,8 +90,8 @@ export function ConteudoProfessores() {
                 NI: '',
                 password: '',
                 escolha: 'P',
-                data_nascimento: '2000-01-01',
-                data_contratacao: '2023-01-01'
+                data_nascimento: '',
+                data_contratacao: ''
             });
 
             await fetchProfessores();
@@ -128,7 +128,7 @@ export function ConteudoProfessores() {
                 throw new Error('Token não encontrado');
             }
 
-            await axios.delete(`${API_URL}${id}/`, {
+            await axios.delete(`${API_URL}${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -151,28 +151,33 @@ export function ConteudoProfessores() {
             if (!token) {
                 throw new Error('Token não encontrado');
             }
-    
-            const professorParaEditar = professores.find(p => p.id === id);
-            if (!professorParaEditar) {
+
+            const professorEditar = professores.find(p => p.id === id);
+            if (!professorEditar) {
                 throw new Error('Professor não encontrado');
             }
 
             const dadosAtualizados = {
-                ...professorParaEditar,
-                nome: professorParaEditar.nome + ' (Editado)',
+                ...professorEditar,
+                nome: professorEditar.nome,
             };
-    
-            await axios.put(`${API_URL}${id}/`, dadosAtualizados, {
+            console.log(dadosAtualizados);
+            await axios.put(`${API_URL}${id}`, dadosAtualizados, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             await fetchProfessores();
             alert('Professor atualizado!');
         } catch (error) {
-            console.error('Erro ao editar', error);
+            console.error('Erro ao editar', {
+                error,
+                response: error.response,
+                data: error.response?.data
+            });
+
             alert('Erro ao editar professor: ' + (error.response?.data?.message || error.message));
         } finally {
             setIsLoading(false);
@@ -228,6 +233,21 @@ export function ConteudoProfessores() {
                             onChange={(e) => setNovoProfessor({ ...novoProfessor, NI: e.target.value })}
                             disabled={isLoading}
                         />
+                        <input
+                            type="date"
+                            placeholder="Data de nascimento"
+                            value={novoProfessor.data_nascimento}
+                            onChange={(e) => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })}
+                            disabled={isLoading}
+                        />
+                        <input
+                            type="date"
+                            placeholder="Data de contratacao"
+                            value={novoProfessor.data_contratacao}
+                            onChange={(e) => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })}
+                            disabled={isLoading}
+                        />
+
                         <div className={estilo.botoes}>
                             <button
                                 type='submit'
@@ -250,25 +270,31 @@ export function ConteudoProfessores() {
 
 
             )}
-             
-             <div className={estilo.containerTabela}>
+
+            <div className={estilo.containerTabela}>
                 <table className={estilo.tabela}>
-                    <thead>
+                    <thead className={estilo.tituloTabela}>
                         <tr>
+                            <th>#</th>
                             <th>Nome</th>
                             <th>Usuário</th>
                             <th>Telefone</th>
                             <th>NI</th>
+                            <th>Nascimento</th>
+                            <th>Contratação</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {professores.map((prof) => (
+                        {professores.map((prof, index) => (
                             <tr key={prof.id}>
-                                <td>{prof.nome}</td>
-                                <td>{prof.username}</td>
-                                <td>{prof.telefone}</td>
-                                <td>{prof.NI}</td>
+                                <td>{index + 1}</td>
+                                <td>{prof.nome || '-'}</td>
+                                <td>{prof.username || '-'}</td>
+                                <td>{prof.telefone || '-'}</td>
+                                <td>{prof.NI || '-'}</td>
+                                <td>{prof.data_nascimento || '-'}</td>
+                                <td>{prof.data_contratacao || '-'}</td>
                                 <td className={estilo.icones}>
                                     <img
                                         src={lapis}
@@ -287,8 +313,8 @@ export function ConteudoProfessores() {
                         ))}
                     </tbody>
                 </table>
-            </div> 
-           
+            </div>
+
         </main>
     );
 }

@@ -24,6 +24,7 @@ class ProfessoresRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
     lookup_field = 'pk'
+    
 
 class DisciplinasListCreateAPIView(ListCreateAPIView):
     queryset = Disciplinas.objects.all()
