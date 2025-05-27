@@ -28,7 +28,7 @@ export function Menu(){
                     <td>
                         <div className={estilo.item}>
                             <img src={book} alt="Ícone de disciplina" className={estilo.icone}/>
-                            <Link to="/professores" style={{ textDecoration: 'none',  color: 'inherit' }}>Disciplinas</Link>
+                            <Link to="/disciplina" style={{ textDecoration: 'none',  color: 'inherit' }}>Disciplinas</Link>
                         </div>
                     </td>
                     <td>
@@ -38,7 +38,6 @@ export function Menu(){
                         </div>
                     </td>
                 </tr>
-
             </table>
         </div>
     )

@@ -28,38 +28,30 @@ export function ConteudoProfessores() {
     }, []);
 
     const fetchProfessores = async () => {
-        setIsLoading(true);
-        setError(null);
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Token não encontrado');
-            }
-
-            const response = await axios.get(API_URL, {
+            const response = await axios.get('http://localhost:8000/api/professores/', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-
-            console.log("DADOS RECEBIDOS:", response.data);
             setProfessores(response.data);
         } catch (error) {
             console.error('Erro ao buscar professores:', error);
-            setError('Erro ao carregar professores');
-        } finally {
-            setIsLoading(false);
         }
     };
 
-    const handleCadastro = async () => {
+    const [editando, setEditando] = useState(false);
+    const [idEditando, setIdEditando] = useState(null);
+
+    const handleSalvar = async () => {
         if (!novoProfessor.telefone.match(/^\(\d{2}\)\d{5}-\d{4}$/)) {
             alert('Telefone deve estar no formato (xx)xxxxx-xxxx');
             return;
         }
 
-        if (!novoProfessor.nome || !novoProfessor.username || !novoProfessor.password) {
+        if (!novoProfessor.nome || !novoProfessor.username || (!editando && !novoProfessor.password)) {
             alert('Preencha todos os campos obrigatórios');
             return;
         }
@@ -69,20 +61,29 @@ export function ConteudoProfessores() {
 
         try {
             const token = localStorage.getItem('token');
+            if (!token) throw new Error('Token não encontrado');
 
-            if (!token) {
-                throw new Error('Token não encontrado');
+            if (editando) {
+                await axios.put(`${API_URL}${idEditando}`, novoProfessor, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                alert('Professor atualizado com sucesso!');
+            } else {
+                await axios.post(API_URL, novoProfessor, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                alert('Professor cadastrado com sucesso!');
             }
 
-            await axios.post(API_URL, novoProfessor, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-
-            });
-
             setVisible(false);
+            setEditando(false);
+            setIdEditando(null);
             setNovoProfessor({
                 nome: '',
                 username: '',
@@ -95,26 +96,14 @@ export function ConteudoProfessores() {
             });
 
             await fetchProfessores();
-
-            alert('Professor cadastrado com sucesso!');
         } catch (error) {
-            console.error('Detalhes do erro:', error.response?.data || error);
-
-            let errorMessage = 'Erro ao cadastrar professor';
-            if (error.response) {
-                if (error.response.status === 401) {
-                    errorMessage = 'Acesso não autorizado. Faça login novamente.';
-                } else if (error.response.data) {
-                    errorMessage = error.response.data.message || JSON.stringify(error.response.data);
-                }
-            }
-
-            setError(errorMessage);
-            alert(errorMessage);
+            console.error('Erro ao salvar:', error);
+            alert('Erro ao salvar professor: ' + (error.response?.data?.message || error.message));
         } finally {
             setIsLoading(false);
         }
     };
+
 
     const handleDelete = async (id) => {
         if (!window.confirm('Tem certeza que deseja excluir este professor?')) {
@@ -144,6 +133,23 @@ export function ConteudoProfessores() {
             setIsLoading(false);
         }
     };
+
+    const abrirModalEdicao = (professor) => {
+        setNovoProfessor({
+            nome: professor.nome || '',
+            username: professor.username || '',
+            telefone: professor.telefone || '',
+            NI: professor.NI || '',
+            password: '',
+            escolha: 'P',
+            data_nascimento: professor.data_nascimento || '',
+            data_contratacao: professor.data_contratacao || ''
+        });
+
+        setIdEditando(professor.id);
+        setEditando(true);
+        setVisible(true);
+    }
 
     const handleEditar = async (id) => {
         try {
@@ -187,7 +193,12 @@ export function ConteudoProfessores() {
     return (
         <main className={estilo.conteudo}>
             <div className={estilo.botao}>
-                <button onClick={() => setVisible(true)} disabled={isLoading}>
+                <button onClick={() => {
+                    setEditando(false);
+                    setIdEditando(null);
+                    setNovoProfessor({ nome: '', username: '', telefone: '', NI: '', password: '', escolha: 'P', data_nascimento: '', data_contratacao: '' });
+                    setVisible(true);
+                }} disabled={isLoading}>
                     {isLoading ? 'Carregando...' : 'Cadastrar Professor'}
                 </button>
             </div>
@@ -197,124 +208,93 @@ export function ConteudoProfessores() {
             {visible && (
                 <div className={estilo.modal}>
                     <div className={estilo.modalContent}>
-                        <h2>Cadastrar Professor</h2>
-                        <input
-                            type="text"
-                            placeholder="Nome*"
-                            value={novoProfessor.nome}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, nome: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Usuário*"
-                            value={novoProfessor.username}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, username: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="password"
-                            placeholder="Senha*"
-                            value={novoProfessor.password}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, password: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Telefone (xx)xxxxx-xxxx*"
-                            value={novoProfessor.telefone}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="number"
-                            placeholder="NI"
-                            value={novoProfessor.NI}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, NI: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="date"
-                            placeholder="Data de nascimento"
-                            value={novoProfessor.data_nascimento}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })}
-                            disabled={isLoading}
-                        />
-                        <input
-                            type="date"
-                            placeholder="Data de contratacao"
-                            value={novoProfessor.data_contratacao}
-                            onChange={(e) => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })}
-                            disabled={isLoading}
-                        />
+                        <h2>{editando ? 'Editar Professor' : 'Cadastrar Professor'}</h2>
+                        <form>
+                            <input
+                                type="text"
+                                placeholder="Nome"
+                                value={novoProfessor.nome}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, nome: e.target.value })}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Usuário"
+                                value={novoProfessor.username}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, username: e.target.value })}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Telefone (xx)xxxxx-xxxx"
+                                value={novoProfessor.telefone}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })}
+                            />
+                            <input
+                                type="text"
+                                placeholder="NI"
+                                value={novoProfessor.NI}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, NI: e.target.value })}
+                            />
+                            {!editando && (
+                                <input
+                                    type="password"
+                                    placeholder="Senha"
+                                    value={novoProfessor.password}
+                                    onChange={e => setNovoProfessor({ ...novoProfessor, password: e.target.value })}
+                                />
+                            )}
+                            <input
+                                type="date"
+                                placeholder="Data de Nascimento"
+                                value={novoProfessor.data_nascimento}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })}
+                            />
+                            <input
+                                type="date"
+                                placeholder="Data de Contratação"
+                                value={novoProfessor.data_contratacao}
+                                onChange={e => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })}
+                            />
 
-                        <div className={estilo.botoes}>
-                            <button
-                                type='submit'
-                                className={estilo.cadastrar}
-                                onClick={handleCadastro}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Cadastrando...' : 'Cadastrar'}
-                            </button>
-                            <button
-                                className={estilo.fechar}
-                                onClick={() => setVisible(false)}
-                                disabled={isLoading}
-                            >
-                                Fechar
-                            </button>
-                        </div>
+                            <div className={estilo.botoes}>
+                                <button
+                                    type="button"
+                                    className={estilo.cadastrar}
+                                    onClick={handleSalvar}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Salvando...' : (editando ? 'Salvar' : 'Cadastrar')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={estilo.fechar}
+                                    onClick={() => setVisible(false)}
+                                    disabled={isLoading}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-
             )}
 
-            <div className={estilo.containerTabela}>
-                <table className={estilo.tabela}>
-                    <thead className={estilo.tituloTabela}>
-                        <tr>
-                            <th>#</th>
-                            <th>Nome</th>
-                            <th>Usuário</th>
-                            <th>Telefone</th>
-                            <th>NI</th>
-                            <th>Nascimento</th>
-                            <th>Contratação</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {professores.map((prof, index) => (
-                            <tr key={prof.id}>
-                                <td>{index + 1}</td>
-                                <td>{prof.nome || '-'}</td>
-                                <td>{prof.username || '-'}</td>
-                                <td>{prof.telefone || '-'}</td>
-                                <td>{prof.NI || '-'}</td>
-                                <td>{prof.data_nascimento || '-'}</td>
-                                <td>{prof.data_contratacao || '-'}</td>
-                                <td className={estilo.icones}>
-                                    <img
-                                        src={lapis}
-                                        alt="Editar"
-                                        className={estilo.iconeAcao}
-                                        onClick={() => handleEditar(prof.id)}
-                                    />
-                                    <img
-                                        src={lixeira}
-                                        alt="Excluir"
-                                        className={estilo.iconeAcao}
-                                        onClick={() => handleDelete(prof.id)}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
 
+            <div className={estilo.cardContainer}>
+                {professores.map((prof) => (
+                    <div key={prof.id} className={estilo.card}>
+                        <h3>{prof.nome || '-'}</h3>
+                        <p><strong>Usuário:</strong> {prof.username || '-'}</p>
+                        <p><strong>Telefone:</strong> {prof.telefone || '-'}</p>
+                        <p><strong>NI:</strong> {prof.NI || '-'}</p>
+                        <p><strong>Nascimento:</strong> {prof.data_nascimento || '-'}</p>
+                        <p><strong>Contratação:</strong> {prof.data_contratacao || '-'}</p>
+                        <div className={estilo.cardBotoes}>
+                            <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(prof)} />
+                            <img src={lixeira} alt="Excluir" onClick={() => handleDelete(prof.id)} />
+                        </div>
+                    </div>
+                ))}
+            </div>
         </main>
     );
 }

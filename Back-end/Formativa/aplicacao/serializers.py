@@ -34,9 +34,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
 
 class DisciplinaSerializer(serializers.ModelSerializer):
+    professor_nome = serializers.CharField(source='professor.nome', read_only=True)
+
     class Meta:
         model = Disciplinas
-        fields = '__all__'
+        fields = '__all__' 
+
 
 class SalaSerializer(serializers.ModelSerializer):
     class Meta:

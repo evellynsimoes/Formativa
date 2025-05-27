@@ -6,6 +6,7 @@ import 'primeicons/primeicons.css';
 import { Home } from './Pages/Home';
 import { Login } from './Pages/Login';
 import { Professores } from './Pages/Professores';
+import { Disciplina } from './Pages/Disciplina';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />}/>
           <Route path="/professores" element={<Professores/>}/>
+          <Route path="/disciplina" element={<Disciplina/>}/>
         </Routes>
       </Router>
     </PrimeReactProvider>
