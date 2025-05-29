@@ -1,13 +1,12 @@
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth import authenticate
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ['NI', 'data_contratacao', 'data_nascimento', 'email', 'escolha', 'id', 'nome','password', 'telefone', 'username']
-
-
 
     def create(self, validated_data):
         user = Usuario.objects.create_user(
@@ -32,7 +31,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-
+class TokenObtainPairSerializerCustom(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['escolha'] = self.user.escolha 
+        return data
+    
 class DisciplinaSerializer(serializers.ModelSerializer):
     professor_nome = serializers.CharField(source='professor.nome', read_only=True)
 

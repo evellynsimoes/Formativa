@@ -6,10 +6,11 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .permissions import IsGestor, IsProfessor
 from rest_framework.permissions import IsAuthenticated
+from .serializers import TokenObtainPairSerializerCustom
 
 
 class LoginView(TokenObtainPairView):
-    serializer_class = TokenObtainPairSerializer
+    serializer_class = TokenObtainPairSerializerCustom
 
 class ProfessoresListCreateAPIView(ListCreateAPIView):
     queryset = Usuario.objects.all()
@@ -24,6 +25,10 @@ class ProfessoresRetrieveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
     lookup_field = 'pk'
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        return [IsGestor()]
     
 
 class DisciplinasListCreateAPIView(ListCreateAPIView):

@@ -37,6 +37,7 @@ export function ConteudoLogin() {
             if (response.ok) {
                 localStorage.setItem('token', data.access);
                 localStorage.setItem('refresh_token', data.refresh);
+                localStorage.setItem('userRole', data.escolha);
                 navigate('/');
             } else {
                 alert('Usuário ou senha inválidos');

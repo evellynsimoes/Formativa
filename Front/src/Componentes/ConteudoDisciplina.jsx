@@ -153,13 +153,13 @@ export function ConteudoDisciplina() {
 
     const abrirModalEdicao = (disciplina) => {
         setNovaDisciplina({
-            nome: '',
-            curso: '',
-            carga_horaria: '',
-            descricao: '',
-            professor: ''
+            nome: disciplina.nome || '',
+            curso: disciplina.curso || '',
+            carga_horaria: disciplina.carga_horaria || '',
+            descricao: disciplina.descricao || '',
+            professor: disciplina.professor || '',
         });
-
+    
         setIdEditando(disciplina.id);
         setEditando(true);
         setVisible(true);

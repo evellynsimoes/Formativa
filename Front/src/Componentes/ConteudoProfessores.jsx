@@ -6,7 +6,6 @@ import lixeira from '../assets/lixeira.png';
 
 const API_URL = 'http://localhost:8000/api/professores/';
 
-
 export function ConteudoProfessores() {
     const [professores, setProfessores] = useState([]);
     const [novoProfessor, setNovoProfessor] = useState({
@@ -22,15 +21,20 @@ export function ConteudoProfessores() {
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isGestor, setIsGestor] = useState(false);
+    const [editando, setEditando] = useState(false);
+    const [idEditando, setIdEditando] = useState(null);
 
     useEffect(() => {
+        const role = localStorage.getItem('userRole');  // 'G' ou 'P'
+        setIsGestor(role === 'G');
         fetchProfessores();
     }, []);
 
     const fetchProfessores = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/api/professores/', {
+            const response = await axios.get(API_URL, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -41,9 +45,6 @@ export function ConteudoProfessores() {
             console.error('Erro ao buscar professores:', error);
         }
     };
-
-    const [editando, setEditando] = useState(false);
-    const [idEditando, setIdEditando] = useState(null);
 
     const handleSalvar = async () => {
         if (!novoProfessor.telefone.match(/^\(\d{2}\)\d{5}-\d{4}$/)) {
@@ -63,15 +64,29 @@ export function ConteudoProfessores() {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('Token não encontrado');
 
+            const dadosParaEnviar = {...novoProfessor};
+
             if (editando) {
-                await axios.put(`${API_URL}${idEditando}`, novoProfessor, {
+                if (!dadosParaEnviar.password) delete dadosParaEnviar.password;
+                if (!dadosParaEnviar.data_nascimento) delete dadosParaEnviar.data_nascimento;
+                if (!dadosParaEnviar.data_contratacao) delete dadosParaEnviar.data_contratacao;
+                if (!dadosParaEnviar.NI) delete dadosParaEnviar.NI;
+                if (!dadosParaEnviar.telefone) delete dadosParaEnviar.telefone;
+            }
+
+            console.log("Enviando dados para atualização:", dadosParaEnviar);
+
+            if (editando) {
+                console.log("Enviando dados para atualização:", dadosParaEnviar);
+                await axios.patch(`${API_URL}${idEditando}`, dadosParaEnviar, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
                 alert('Professor atualizado com sucesso!');
-            } else {
+            }
+            else {
                 await axios.post(API_URL, novoProfessor, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -104,18 +119,13 @@ export function ConteudoProfessores() {
         }
     };
 
-
     const handleDelete = async (id) => {
-        if (!window.confirm('Tem certeza que deseja excluir este professor?')) {
-            return;
-        }
+        if (!window.confirm('Tem certeza que deseja excluir este professor?')) return;
 
         setIsLoading(true);
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Token não encontrado');
-            }
+            if (!token) throw new Error('Token não encontrado');
 
             await axios.delete(`${API_URL}${id}`, {
                 headers: {
@@ -149,59 +159,22 @@ export function ConteudoProfessores() {
         setIdEditando(professor.id);
         setEditando(true);
         setVisible(true);
-    }
-
-    const handleEditar = async (id) => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Token não encontrado');
-            }
-
-            const professorEditar = professores.find(p => p.id === id);
-            if (!professorEditar) {
-                throw new Error('Professor não encontrado');
-            }
-
-            const dadosAtualizados = {
-                ...professorEditar,
-                nome: professorEditar.nome,
-            };
-            console.log(dadosAtualizados);
-            await axios.put(`${API_URL}${id}`, dadosAtualizados, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            await fetchProfessores();
-            alert('Professor atualizado!');
-        } catch (error) {
-            console.error('Erro ao editar', {
-                error,
-                response: error.response,
-                data: error.response?.data
-            });
-
-            alert('Erro ao editar professor: ' + (error.response?.data?.message || error.message));
-        } finally {
-            setIsLoading(false);
-        }
     };
 
     return (
         <main className={estilo.conteudo}>
-            <div className={estilo.botao}>
-                <button onClick={() => {
-                    setEditando(false);
-                    setIdEditando(null);
-                    setNovoProfessor({ nome: '', username: '', telefone: '', NI: '', password: '', escolha: 'P', data_nascimento: '', data_contratacao: '' });
-                    setVisible(true);
-                }} disabled={isLoading}>
-                    {isLoading ? 'Carregando...' : 'Cadastrar Professor'}
-                </button>
-            </div>
+            {isGestor && (
+                <div className={estilo.botao}>
+                    <button onClick={() => {
+                        setEditando(false);
+                        setIdEditando(null);
+                        setNovoProfessor({ nome: '', username: '', telefone: '', NI: '', password: '', escolha: 'P', data_nascimento: '', data_contratacao: '' });
+                        setVisible(true);
+                    }} disabled={isLoading}>
+                        {isLoading ? 'Carregando...' : 'Cadastrar Professor'}
+                    </button>
+                </div>
+            )}
 
             {error && <div className={estilo.erro}>{error}</div>}
 
@@ -210,66 +183,21 @@ export function ConteudoProfessores() {
                     <div className={estilo.modalContent}>
                         <h2>{editando ? 'Editar Professor' : 'Cadastrar Professor'}</h2>
                         <form>
-                            <input
-                                type="text"
-                                placeholder="Nome"
-                                value={novoProfessor.nome}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, nome: e.target.value })}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Usuário"
-                                value={novoProfessor.username}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, username: e.target.value })}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Telefone (xx)xxxxx-xxxx"
-                                value={novoProfessor.telefone}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })}
-                            />
-                            <input
-                                type="text"
-                                placeholder="NI"
-                                value={novoProfessor.NI}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, NI: e.target.value })}
-                            />
+                            <input type="text" placeholder="Nome" value={novoProfessor.nome} onChange={e => setNovoProfessor({ ...novoProfessor, nome: e.target.value })} />
+                            <input type="text" placeholder="Usuário" value={novoProfessor.username} onChange={e => setNovoProfessor({ ...novoProfessor, username: e.target.value })} />
+                            <input type="text" placeholder="Telefone (xx)xxxxx-xxxx" value={novoProfessor.telefone} onChange={e => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })} />
+                            <input type="text" placeholder="NI" value={novoProfessor.NI} onChange={e => setNovoProfessor({ ...novoProfessor, NI: e.target.value })} />
                             {!editando && (
-                                <input
-                                    type="password"
-                                    placeholder="Senha"
-                                    value={novoProfessor.password}
-                                    onChange={e => setNovoProfessor({ ...novoProfessor, password: e.target.value })}
-                                />
+                                <input type="password" placeholder="Senha" value={novoProfessor.password} onChange={e => setNovoProfessor({ ...novoProfessor, password: e.target.value })} />
                             )}
-                            <input
-                                type="date"
-                                placeholder="Data de Nascimento"
-                                value={novoProfessor.data_nascimento}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })}
-                            />
-                            <input
-                                type="date"
-                                placeholder="Data de Contratação"
-                                value={novoProfessor.data_contratacao}
-                                onChange={e => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })}
-                            />
+                            <input type="date" placeholder="Data de Nascimento" value={novoProfessor.data_nascimento} onChange={e => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })} />
+                            <input type="date" placeholder="Data de Contratação" value={novoProfessor.data_contratacao} onChange={e => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })} />
 
                             <div className={estilo.botoes}>
-                                <button
-                                    type="button"
-                                    className={estilo.cadastrar}
-                                    onClick={handleSalvar}
-                                    disabled={isLoading}
-                                >
+                                <button type="button" className={estilo.cadastrar} onClick={handleSalvar} disabled={isLoading}>
                                     {isLoading ? 'Salvando...' : (editando ? 'Salvar' : 'Cadastrar')}
                                 </button>
-                                <button
-                                    type="button"
-                                    className={estilo.fechar}
-                                    onClick={() => setVisible(false)}
-                                    disabled={isLoading}
-                                >
+                                <button type="button" className={estilo.fechar} onClick={() => setVisible(false)} disabled={isLoading}>
                                     Cancelar
                                 </button>
                             </div>
@@ -277,7 +205,6 @@ export function ConteudoProfessores() {
                     </div>
                 </div>
             )}
-
 
             <div className={estilo.cardContainer}>
                 {professores.map((prof) => (
@@ -288,10 +215,13 @@ export function ConteudoProfessores() {
                         <p><strong>NI:</strong> {prof.NI || '-'}</p>
                         <p><strong>Nascimento:</strong> {prof.data_nascimento || '-'}</p>
                         <p><strong>Contratação:</strong> {prof.data_contratacao || '-'}</p>
-                        <div className={estilo.cardBotoes}>
-                            <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(prof)} />
-                            <img src={lixeira} alt="Excluir" onClick={() => handleDelete(prof.id)} />
-                        </div>
+
+                        {isGestor && (
+                            <div className={estilo.cardBotoes}>
+                                <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(prof)} />
+                                <img src={lixeira} alt="Excluir" onClick={() => handleDelete(prof.id)} />
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
