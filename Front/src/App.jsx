@@ -10,7 +10,7 @@ import { Professores } from './Pages/Professores';
 import { Disciplina } from './Pages/Disciplina';
 import { Salas } from './Pages/Salas';
 import { Ambientes } from './Pages/Ambientes';
-// import { Gestores } from './Pages/Gestores';
+import { Gestores } from './Pages/Gestores';
 
 function App() {
   return (
@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" element={<Login />}/>
           <Route path="/professores" element={<Professores/>}/>
           <Route path="/disciplina" element={<Disciplina/>}/>
-          {/* <Route path="/gestores" element={<Gestores/>}/> */}
+          <Route path="/gestores" element={<Gestores/>}/>
           <Route path="/salas" element={<Salas/>}/>
           <Route path="/ambientes" element={<Ambientes/>}/>
         </Routes>

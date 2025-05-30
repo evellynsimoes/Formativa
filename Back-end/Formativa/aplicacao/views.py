@@ -68,6 +68,9 @@ class ReservaAmbienteListCreateAPIView(ListCreateAPIView):
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         return [IsGestor()]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
 
 class ReservaAmbienteUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     queryset = ReservaAmbiente.objects.all()

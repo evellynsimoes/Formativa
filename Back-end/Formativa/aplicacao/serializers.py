@@ -51,6 +51,9 @@ class SalaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ReservaAmbienteSerializer(serializers.ModelSerializer):
+    data_inicio = serializers.DateTimeField()
+    data_termino = serializers.DateTimeField()
+
     class Meta:
         model = ReservaAmbiente
         fields = '__all__'

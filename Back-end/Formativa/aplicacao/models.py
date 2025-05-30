@@ -40,8 +40,8 @@ class Sala(models.Model):
         return self.nome
 
 class ReservaAmbiente(models.Model):
-    data_inicio = models.DateField(null=True, blank=True)
-    data_termino = models.DateField(null=True, blank=True)
+    data_inicio = models.DateTimeField(null=True, blank=True)
+    data_termino = models.DateTimeField(null=True, blank=True)
     escolha_periodo = (
         ('M', 'Manhã'),
         ('T', 'Tarde'),

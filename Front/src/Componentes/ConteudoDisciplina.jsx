@@ -21,8 +21,12 @@ export function ConteudoDisciplina() {
     const [error, setError] = useState(null);
     const [editando, setEditando] = useState(false);
     const [idEditando, setIdEditando] = useState(null);
+    const [isGestor, setIsGestor] = useState(false);
+
 
     useEffect(() => {
+        const role = localStorage.getItem('userRole');
+        setIsGestor(role === 'G');
         fetchDisciplinas();
         fetchProfessores();
     }, []);
@@ -159,7 +163,7 @@ export function ConteudoDisciplina() {
             descricao: disciplina.descricao || '',
             professor: disciplina.professor || '',
         });
-    
+
         setIdEditando(disciplina.id);
         setEditando(true);
         setVisible(true);
@@ -206,26 +210,27 @@ export function ConteudoDisciplina() {
 
     return (
         <main className={estilo.conteudo}>
-            <div className={estilo.botao}>
-                <button
-                    onClick={() => {
-                        setEditando(false);
-                        setIdEditando(null);
-                        setNovaDisciplina({
-                            nome: '',
-                            curso: '',
-                            carga_horaria: '',
-                            descricao: '',
-                            professor: ''
-                        });
-                        setVisible(true);
-                    }}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Carregando...' : 'Cadastrar Disciplina'}
-                </button>
-
-            </div>
+            {isGestor && (
+                <div className={estilo.botao}>
+                    <button
+                        onClick={() => {
+                            setEditando(false);
+                            setIdEditando(null);
+                            setNovaDisciplina({
+                                nome: '',
+                                curso: '',
+                                carga_horaria: '',
+                                descricao: '',
+                                professor: ''
+                            });
+                            setVisible(true);
+                        }}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Carregando...' : 'Cadastrar Disciplina'}
+                    </button>
+                </div>
+            )}
 
             {error && <div className={estilo.erro}>{error}</div>}
 
@@ -318,10 +323,12 @@ export function ConteudoDisciplina() {
                         <p><strong>Carga Horária:</strong> {disc.carga_horaria}</p>
                         <p><strong>Descrição:</strong> {disc.descricao}</p>
                         <p><strong>Professor:</strong> {disc.professor}</p>
-                        <div className={estilo.cardBotoes}>
-                            <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(disc)} />
-                            <img src={lixeira} alt="Excluir" onClick={() => handleDelete(disc.id)} />
-                        </div>
+                        {isGestor && (
+                            <div className={estilo.cardBotoes}>
+                                <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(disc)} />
+                                <img src={lixeira} alt="Excluir" onClick={() => handleDelete(disc.id)} />
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

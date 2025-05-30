@@ -207,7 +207,9 @@ export function ConteudoProfessores() {
             )}
 
             <div className={estilo.cardContainer}>
-                {professores.map((prof) => (
+                {professores
+                .filter(prof => prof.escolha === 'P')
+                .map((prof) => (
                     <div key={prof.id} className={estilo.card}>
                         <h3>{prof.nome || '-'}</h3>
                         <p><strong>Usuário:</strong> {prof.username || '-'}</p>

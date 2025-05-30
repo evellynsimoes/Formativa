@@ -9,11 +9,13 @@ const API_URL = 'http://localhost:8000/api/reservaAmbiente/';
 export function ConteudoAmbiente() {
     const [reservas, setReservas] = useState([]);
     const [disciplinas, setDisciplinas] = useState([]);
-    const [professores, setProfessores] = useState([]);
     const [salas, setSalas] = useState([]);
+    const [professores, setProfessores] = useState([]);
+
     const [novaReserva, setNovaReserva] = useState({
         data_inicio: '',
         data_termino: '',
+        escolha: '',
         disciplina: '',
         professor: '',
         sala_reservada: '',
@@ -23,12 +25,16 @@ export function ConteudoAmbiente() {
     const [error, setError] = useState(null);
     const [editando, setEditando] = useState(false);
     const [idEditando, setIdEditando] = useState(null);
+    const [isGestor, setIsGestor] = useState(false);
+
 
     useEffect(() => {
+        const role = localStorage.getItem('userRole');
+        setIsGestor(role === 'G');
         fetchReservas();
         fetchDisciplinas();
-        fetchProfessores();
         fetchSalas();
+        fetchProfessores();
     }, []);
 
     const fetchReservas = async () => {
@@ -59,6 +65,18 @@ export function ConteudoAmbiente() {
         }
     };
 
+    const fetchSalas = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:8000/api/sala/', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSalas(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar salas:', error);
+        }
+    };
+
     const fetchProfessores = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -71,21 +89,9 @@ export function ConteudoAmbiente() {
         }
     };
 
-    const fetchSalas = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:8000/api/salas/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setSalas(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar salas:', error);
-        }
-    };
-
     const handleSalvar = async () => {
-        const { data_inicio, data_termino, disciplina, professor, sala_reservada } = novaReserva;
-        if (!data_inicio || !data_termino || !disciplina || !professor || !sala_reservada) {
+        const { data_inicio, data_termino, escolha, disciplina, professor, sala_reservada } = novaReserva;
+        if (!data_inicio || !data_termino || !escolha || !disciplina || !sala_reservada || !professor) {
             alert('Preencha todos os campos obrigatórios');
             return;
         }
@@ -95,13 +101,22 @@ export function ConteudoAmbiente() {
         try {
             const token = localStorage.getItem('token');
 
+            const payload = {
+                data_inicio,
+                data_termino,
+                escolha,
+                disciplina: Number(disciplina),
+                sala_reservada: Number(sala_reservada),
+                usuario: Number(professor)
+            };
+
             if (editando) {
-                await axios.put(`${API_URL}${idEditando}/`, novaReserva, {
+                await axios.put(`${API_URL}${idEditando}/`, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 alert('Reserva atualizada com sucesso!');
             } else {
-                await axios.post(API_URL, novaReserva, {
+                await axios.post(API_URL, payload, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 alert('Reserva cadastrada com sucesso!');
@@ -113,6 +128,7 @@ export function ConteudoAmbiente() {
             setNovaReserva({
                 data_inicio: '',
                 data_termino: '',
+                escolha: '',
                 disciplina: '',
                 professor: '',
                 sala_reservada: '',
@@ -120,7 +136,7 @@ export function ConteudoAmbiente() {
 
             await fetchReservas();
         } catch (error) {
-            alert('Erro ao salvar reserva: ' + (error.response?.data?.message || error.message));
+            alert('Erro ao salvar reserva: ' + (error.response?.data || error.message));
         } finally {
             setIsLoading(false);
         }
@@ -138,7 +154,7 @@ export function ConteudoAmbiente() {
             await fetchReservas();
             alert('Reserva excluída com sucesso!');
         } catch (error) {
-            alert('Erro ao excluir reserva: ' + (error.response?.data?.message || error.message));
+            alert('Erro ao excluir reserva: ' + (error.response?.data || error.message));
         } finally {
             setIsLoading(false);
         }
@@ -148,8 +164,9 @@ export function ConteudoAmbiente() {
         setNovaReserva({
             data_inicio: reserva.data_inicio || '',
             data_termino: reserva.data_termino || '',
+            escolha: reserva.escolha || '',
             disciplina: reserva.disciplina || '',
-            professor: reserva.professor || '',
+            professor: reserva.usuario || '',
             sala_reservada: reserva.sala_reservada || '',
         });
         setIdEditando(reserva.id);
@@ -159,22 +176,25 @@ export function ConteudoAmbiente() {
 
     return (
         <main className={estilo.conteudo}>
-            <div className={estilo.botao}>
-                <button onClick={() => {
-                    setEditando(false);
-                    setIdEditando(null);
-                    setNovaReserva({
-                        data_inicio: '',
-                        data_termino: '',
-                        disciplina: '',
-                        professor: '',
-                        sala_reservada: '',
-                    });
-                    setVisible(true);
-                }}>
-                    {isLoading ? 'Carregando...' : 'Cadastrar Reserva'}
-                </button>
-            </div>
+            {isGestor && (
+                <div className={estilo.botao}>
+                    <button onClick={() => {
+                        setEditando(false);
+                        setIdEditando(null);
+                        setNovaReserva({
+                            data_inicio: '',
+                            data_termino: '',
+                            escolha: '',
+                            disciplina: '',
+                            professor: '',
+                            sala_reservada: '',
+                        });
+                        setVisible(true);
+                    }}>
+                        {isLoading ? 'Carregando...' : 'Cadastrar Reserva'}
+                    </button>
+                </div>
+            )}
 
             {error && <div className={estilo.erro}>{error}</div>}
 
@@ -183,27 +203,61 @@ export function ConteudoAmbiente() {
                     <div className={estilo.modalContent}>
                         <h2>{editando ? 'Editar' : 'Cadastrar'} Reserva</h2>
 
-                        <input type="datetime-local" value={novaReserva.data_inicio} onChange={(e) => setNovaReserva({ ...novaReserva, data_inicio: e.target.value })} />
-                        <input type="datetime-local" value={novaReserva.data_termino} onChange={(e) => setNovaReserva({ ...novaReserva, data_termino: e.target.value })} />
+                        <label>Data Início:</label>
+                        <input
+                            type="datetime-local"
+                            value={novaReserva.data_inicio}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, data_inicio: e.target.value })}
+                        />
 
-                        <select value={novaReserva.disciplina} onChange={(e) => setNovaReserva({ ...novaReserva, disciplina: e.target.value })}>
+                        <label>Data Término:</label>
+                        <input
+                            type="datetime-local"
+                            value={novaReserva.data_termino}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, data_termino: e.target.value })}
+                        />
+
+                        <label>Período:</label>
+                        <select
+                            value={novaReserva.escolha}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, escolha: e.target.value })}
+                        >
+                            <option value="">Selecione um período</option>
+                            <option value="M">Manhã</option>
+                            <option value="T">Tarde</option>
+                            <option value="N">Noite</option>
+                        </select>
+
+                        <label>Disciplina:</label>
+                        <select
+                            value={novaReserva.disciplina}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, disciplina: e.target.value })}
+                        >
                             <option value="">Selecione uma disciplina</option>
                             {disciplinas.map((d) => (
                                 <option key={d.id} value={d.id}>{d.nome}</option>
                             ))}
                         </select>
 
-                        <select value={novaReserva.professor} onChange={(e) => setNovaReserva({ ...novaReserva, professor: e.target.value })}>
-                            <option value="">Selecione um professor</option>
-                            {professores.map((p) => (
-                                <option key={p.id} value={p.id}>{p.nome}</option>
-                            ))}
-                        </select>
-
-                        <select value={novaReserva.sala_reservada} onChange={(e) => setNovaReserva({ ...novaReserva, sala_reservada: e.target.value })}>
+                        <label>Sala Reservada:</label>
+                        <select
+                            value={novaReserva.sala_reservada}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, sala_reservada: e.target.value })}
+                        >
                             <option value="">Selecione uma sala</option>
                             {salas.map((s) => (
                                 <option key={s.id} value={s.id}>{s.nome}</option>
+                            ))}
+                        </select>
+
+                        <label>Professor:</label>
+                        <select
+                            value={novaReserva.professor}
+                            onChange={(e) => setNovaReserva({ ...novaReserva, professor: e.target.value })}
+                        >
+                            <option value="">Selecione um professor</option>
+                            {professores.map((p) => (
+                                <option key={p.id} value={p.id}>{p.nome}</option>
                             ))}
                         </select>
 
@@ -217,39 +271,32 @@ export function ConteudoAmbiente() {
                 </div>
             )}
 
-            <table className={estilo.tabela}>
-                <thead>
-                    <tr>
-                        <th>Data Início</th>
-                        <th>Data Término</th>
-                        <th>Disciplina</th>
-                        <th>Professor</th>
-                        <th>Sala</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {reservas.length === 0 ? (
-                        <tr><td colSpan={6}>Nenhuma reserva encontrada.</td></tr>
-                    ) : (
-                        reservas.map((reserva) => (
-                            <tr key={reserva.id}>
-                                <td>{new Date(reserva.data_inicio).toLocaleString()}</td>
-                                <td>{new Date(reserva.data_termino).toLocaleString()}</td>
-                                <td>{reserva.disciplina_nome || reserva.disciplina}</td>
-                                <td>{reserva.professor_nome || reserva.professor}</td>
-                                <td>
-                                    {
-                                        salas.find(s => s.id === reserva.sala_reservada)?.nome || reserva.sala_reservada
-                                    }
-                                </td>
-                                <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(reserva)} style={{ cursor: 'pointer', marginRight: 10 }} />
-                                <img src={lixeira} alt="Excluir" onClick={() => handleDelete(reserva.id)} style={{ cursor: 'pointer' }} />
-                            </tr>
-                ))
-                    )}
-            </tbody>
-        </table>
-        </main >
+            <div className={estilo.cardContainer}>
+                {reservas.map((reserva) => {
+                    const disciplina = disciplinas.find(d => d.id === reserva.disciplina);
+                    const sala = salas.find(s => s.id === reserva.sala_reservada);
+                    const professor = professores.find(p => p.id === reserva.usuario);
+
+                    return (
+                        <div key={reserva.id} className={estilo.card}>
+                            <h3>{disciplina ? disciplina.nome : 'Disciplina desconhecida'}</h3>
+                            <p><strong>Período:</strong> {reserva.escolha === 'M' ? 'Manhã' : reserva.escolha === 'T' ? 'Tarde' : 'Noite'}</p>
+                            <p><strong>Sala:</strong> {sala ? sala.nome : 'Sala desconhecida'}</p>
+                            <p><strong>Professor:</strong> {professor ? professor.nome : 'Professor desconhecido'}</p>
+                            <p><strong>Início:</strong> {new Date(reserva.data_inicio).toLocaleString()}</p>
+                            <p><strong>Término:</strong> {new Date(reserva.data_termino).toLocaleString()}</p>
+
+                            {isGestor && (
+                            <div className={estilo.cardBotoes}>
+                                <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(reserva)} />
+                                <img src={lixeira} alt="Excluir" onClick={() => handleDelete(reserva.id)} />
+                            </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+        </main>
     );
 }
