@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator,MinValueValidator
+from django.core.exceptions import ValidationError
+
 
 class Usuario(AbstractUser):
     escolha_profissao = (
@@ -34,8 +36,14 @@ class Disciplinas(models.Model):
         return self.nome
     
 class Sala(models.Model):
-    nome = models.CharField(max_length=20)
-    capacidade = models.IntegerField()
+    nome = models.CharField(max_length=20,unique=True)
+    capacidade = models.IntegerField(validators=[MinValueValidator(1)])
+
+    def clean(self):
+    
+        if Sala.objects.filter(nome__iexact=self.nome).exclude(pk=self.pk).exists():
+            raise ValidationError({'nome': 'Uma sala com este nome já existe.'})
+        
     def __str__(self):
         return self.nome
 

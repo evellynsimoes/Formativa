@@ -52,8 +52,13 @@ export function ConteudoProfessores() {
             return;
         }
 
-        if (!novoProfessor.nome || !novoProfessor.username || (!editando && !novoProfessor.password)) {
+        if (!novoProfessor.nome || !novoProfessor.username || !novoProfessor.NI || (!editando && !novoProfessor.password)) {
             alert('Preencha todos os campos obrigatórios');
+            return;
+        }
+
+        if (!/^[A-Za-zÀ-ÿ\s]+$/.test(novoProfessor.nome)){
+            alert('O nome deve conter apenas letras')
             return;
         }
 
@@ -183,15 +188,41 @@ export function ConteudoProfessores() {
                     <div className={estilo.modalContent}>
                         <h2>{editando ? 'Editar Professor' : 'Cadastrar Professor'}</h2>
                         <form>
-                            <input type="text" placeholder="Nome" value={novoProfessor.nome} onChange={e => setNovoProfessor({ ...novoProfessor, nome: e.target.value })} />
-                            <input type="text" placeholder="Usuário" value={novoProfessor.username} onChange={e => setNovoProfessor({ ...novoProfessor, username: e.target.value })} />
-                            <input type="text" placeholder="Telefone (xx)xxxxx-xxxx" value={novoProfessor.telefone} onChange={e => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })} />
-                            <input type="text" placeholder="NI" value={novoProfessor.NI} onChange={e => setNovoProfessor({ ...novoProfessor, NI: e.target.value })} />
+                            <label>
+                                Nome:
+                                <input type="text" placeholder="Nome*" value={novoProfessor.nome} onChange={e => setNovoProfessor({ ...novoProfessor, nome: e.target.value })} />
+                            </label>
+
+                            <label>
+                                Username:
+                                <input type="text" placeholder="Usuário*" value={novoProfessor.username} onChange={e => setNovoProfessor({ ...novoProfessor, username: e.target.value })} />
+                            </label>
+
+                            <label>Telefone:
+                                <input type="text" placeholder="Telefone (xx)xxxxx-xxxx*" value={novoProfessor.telefone} onChange={e => setNovoProfessor({ ...novoProfessor, telefone: e.target.value })} />
+                            </label>
+
+                            <label>
+                                Número de identificação:
+                                <input type="text" placeholder="NI*" value={novoProfessor.NI} onChange={e => setNovoProfessor({ ...novoProfessor, NI: e.target.value })} />
+                            </label>
+
                             {!editando && (
-                                <input type="password" placeholder="Senha" value={novoProfessor.password} onChange={e => setNovoProfessor({ ...novoProfessor, password: e.target.value })} />
+                                <label>
+                                    Senha:
+                                    <input type="password" placeholder="Senha*" value={novoProfessor.password} onChange={e => setNovoProfessor({ ...novoProfessor, password: e.target.value })} />
+                                </label>
                             )}
-                            <input type="date" placeholder="Data de Nascimento" value={novoProfessor.data_nascimento} onChange={e => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })} />
-                            <input type="date" placeholder="Data de Contratação" value={novoProfessor.data_contratacao} onChange={e => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })} />
+
+                            <label>
+                                Data de nascimento:
+                                <input type="date" placeholder="Data de Nascimento" value={novoProfessor.data_nascimento} onChange={e => setNovoProfessor({ ...novoProfessor, data_nascimento: e.target.value })} />
+                            </label>
+
+                            <label>
+                                Data de contratação:
+                                <input type="date" placeholder="Data de Contratação" value={novoProfessor.data_contratacao} onChange={e => setNovoProfessor({ ...novoProfessor, data_contratacao: e.target.value })} />
+                            </label>
 
                             <div className={estilo.botoes}>
                                 <button type="button" className={estilo.cadastrar} onClick={handleSalvar} disabled={isLoading}>
@@ -211,12 +242,14 @@ export function ConteudoProfessores() {
                 .filter(prof => prof.escolha === 'P')
                 .map((prof) => (
                     <div key={prof.id} className={estilo.card}>
-                        <h3>{prof.nome || '-'}</h3>
-                        <p><strong>Usuário:</strong> {prof.username || '-'}</p>
-                        <p><strong>Telefone:</strong> {prof.telefone || '-'}</p>
-                        <p><strong>NI:</strong> {prof.NI || '-'}</p>
-                        <p><strong>Nascimento:</strong> {prof.data_nascimento || '-'}</p>
-                        <p><strong>Contratação:</strong> {prof.data_contratacao || '-'}</p>
+                        <div className={estilo.inf}>
+                            <h3>{prof.nome || '-'}</h3>
+                            <p><strong>Usuário:</strong> {prof.username || '-'}</p>
+                            <p><strong>Telefone:</strong> {prof.telefone || '-'}</p>
+                            <p><strong>NI:</strong> {prof.NI || '-'}</p>
+                            <p><strong>Nascimento:</strong> {prof.data_nascimento || '-'}</p>
+                            <p><strong>Contratação:</strong> {prof.data_contratacao || '-'}</p>
+                        </div>
 
                         {isGestor && (
                             <div className={estilo.cardBotoes}>

@@ -2,12 +2,19 @@ from rest_framework import serializers
 from .models import *
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import re
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ['NI', 'data_contratacao', 'data_nascimento', 'email', 'escolha', 'id', 'nome','password', 'telefone', 'username']
 
+    def validate_nome(self, value):
+        import re
+        if not re.match (r'^[A-Za-zÀ-ÿ\s]+$', value):
+            raise serializers.ValidationError("O nome deve conter apenas letras")
+        return value
+    
     def create(self, validated_data):
         user = Usuario.objects.create_user(
             password=validated_data['password'],
@@ -30,6 +37,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
     
 class TokenObtainPairSerializerCustom(TokenObtainPairSerializer):
     def validate(self, attrs):

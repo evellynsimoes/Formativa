@@ -211,12 +211,14 @@ export function ConteudoGestores() {
                 .filter(gest => gest.escolha === 'G')
                 .map((gest) => (
                     <div key={gest.id} className={estilo.card}>
-                        <h3>{gest.nome || '-'}</h3>
-                        <p><strong>Usuário:</strong> {gest.username || '-'}</p>
-                        <p><strong>Telefone:</strong> {gest.telefone || '-'}</p>
-                        <p><strong>NI:</strong> {gest.NI || '-'}</p>
-                        <p><strong>Nascimento:</strong> {gest.data_nascimento || '-'}</p>
-                        <p><strong>Contratação:</strong> {gest.data_contratacao || '-'}</p>
+                        <div className={estilo.inf}>
+                            <h3>{gest.nome || '-'}</h3>
+                            <p><strong>Usuário:</strong> {gest.username || '-'}</p>
+                            <p><strong>Telefone:</strong> {gest.telefone || '-'}</p>
+                            <p><strong>NI:</strong> {gest.NI || '-'}</p>
+                            <p><strong>Nascimento:</strong> {gest.data_nascimento || '-'}</p>
+                            <p><strong>Contratação:</strong> {gest.data_contratacao || '-'}</p>
+                        </div>
 
                         {isGestor && (
                             <div className={estilo.cardBotoes}>

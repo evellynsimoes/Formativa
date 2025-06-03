@@ -6,11 +6,12 @@
 
 .cardContainer {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
+    flex-wrap: wrap;
     gap: 20px;
     padding: 0 20px;
     margin-top: 20px;
-    width: 400px;
+    /* width: 400px; */
     justify-content: center;
 }
 
@@ -20,7 +21,17 @@
     padding: 30px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.245);
     transition: transform 0.2s ease;
+    display: flex;
+    /* flex-direction: column; */
+    width: 30rem;
+    justify-content: space-between;
 }
+
+.inf{
+    display: flex;
+    flex-direction: column;
+}
+
 
 .card:hover {
     transform: translateY(-2px);
@@ -37,11 +48,6 @@
     color: #444;
 }
 
-.cardBotoes {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
 
 .cardBotoes img{
     width: 20px;

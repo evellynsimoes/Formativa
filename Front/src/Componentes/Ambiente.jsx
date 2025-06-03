@@ -279,12 +279,14 @@ export function ConteudoAmbiente() {
 
                     return (
                         <div key={reserva.id} className={estilo.card}>
-                            <h3>{disciplina ? disciplina.nome : 'Disciplina desconhecida'}</h3>
-                            <p><strong>Período:</strong> {reserva.escolha === 'M' ? 'Manhã' : reserva.escolha === 'T' ? 'Tarde' : 'Noite'}</p>
-                            <p><strong>Sala:</strong> {sala ? sala.nome : 'Sala desconhecida'}</p>
-                            <p><strong>Professor:</strong> {professor ? professor.nome : 'Professor desconhecido'}</p>
-                            <p><strong>Início:</strong> {new Date(reserva.data_inicio).toLocaleString()}</p>
-                            <p><strong>Término:</strong> {new Date(reserva.data_termino).toLocaleString()}</p>
+                            <div className={estilo.inf}>
+                                <h3>{disciplina ? disciplina.nome : 'Disciplina desconhecida'}</h3>
+                                <p><strong>Período:</strong> {reserva.escolha === 'M' ? 'Manhã' : reserva.escolha === 'T' ? 'Tarde' : 'Noite'}</p>
+                                <p><strong>Sala:</strong> {sala ? sala.nome : 'Sala desconhecida'}</p>
+                                <p><strong>Professor:</strong> {professor ? professor.nome : 'Professor desconhecido'}</p>
+                                <p><strong>Início:</strong> {new Date(reserva.data_inicio).toLocaleString()}</p>
+                                <p><strong>Término:</strong> {new Date(reserva.data_termino).toLocaleString()}</p>
+                            </div>
 
                             {isGestor && (
                             <div className={estilo.cardBotoes}>

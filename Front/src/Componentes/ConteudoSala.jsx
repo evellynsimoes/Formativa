@@ -3,6 +3,7 @@ import estilo from './ConteudoProfessores.module.css';
 import axios from 'axios';
 import lapis from '../assets/lapis.png';
 import lixeira from '../assets/lixeira.png';
+import Swal from "sweetalert2";
 
 const API_URL = 'http://localhost:8000/api/sala/';
 
@@ -66,7 +67,12 @@ export function ConteudoSala() {
                         'Content-Type': 'application/json'
                     }
                 });
-                alert('Sala atualizada com sucesso!');
+                Swal.fire({
+                    title: "Sala editada com sucesso!",
+                    icon: "success",
+                    draggable: true
+                  });
+                  
             } else {
                 await axios.post(API_URL, dadosParaEnviar, {
                     headers: {
@@ -74,7 +80,12 @@ export function ConteudoSala() {
                         'Content-Type': 'application/json'
                     }
                 });
-                alert('Sala cadastrada com sucesso!');
+                Swal.fire({
+                    title: "Sala criada com sucesso!",
+                    icon: "success",
+                    draggable: true
+                  });
+                  
             }
 
             setVisible(false);
@@ -87,8 +98,16 @@ export function ConteudoSala() {
 
             await fetchSalas();
         } catch (error) {
+            if (error.response?.data) {
+                const errorData = error.response.data;
+                const primeiroCampo = Object.keys(errorData)[0];
+                const primeiraMensagem = errorData[primeiroCampo][0]; 
+                
+                Swal.fire("Erro ao salvar sala", `Dados incorretos, tente novamente`, "error");
+            } else {
+                Swal.fire("Erro inesperado", error.message, "error");
+            }
             console.error('Erro ao salvar:', error);
-            alert('Erro ao salvar sala: ' + (error.response?.data?.message || error.message));
         } finally {
             setIsLoading(false);
         }
@@ -172,8 +191,10 @@ export function ConteudoSala() {
             <div className={estilo.cardContainer}>
                 {salas.map((sala) => (
                     <div key={sala.id} className={estilo.card}>
-                        <h3>{sala.nome || '-'}</h3>
-                        <p><strong>Capacidade:</strong> {sala.capacidade || '-'}</p>
+                        <div className={estilo.inf}>
+                            <h3>{sala.nome || '-'}</h3>
+                            <p><strong>Capacidade:</strong> {sala.capacidade || '-'}</p>
+                        </div>
                         {isGestor && (
                             <div className={estilo.cardBotoes}>
                                 <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(sala)} />

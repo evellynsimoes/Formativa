@@ -318,17 +318,23 @@ export function ConteudoDisciplina() {
             <div className={estilo.cardContainer}>
                 {disciplinas.map((disc) => (
                     <div key={disc.id} className={estilo.card}>
-                        <h3>{disc.nome}</h3>
-                        <p><strong>Curso:</strong> {disc.curso}</p>
-                        <p><strong>Carga Horária:</strong> {disc.carga_horaria}</p>
-                        <p><strong>Descrição:</strong> {disc.descricao}</p>
-                        <p><strong>Professor:</strong> {disc.professor}</p>
+                        
+                        <div className={estilo.inf}>
+                            <h3>{disc.nome}</h3>
+
+                            <p><strong>Curso:</strong> {disc.curso}</p>
+                            <p><strong>Carga Horária:</strong> {disc.carga_horaria}</p>
+                            <p><strong>Descrição:</strong> {disc.descricao}</p>
+                            <p><strong>Professor:</strong> {disc.professor}</p>
+                        </div>
+
                         {isGestor && (
                             <div className={estilo.cardBotoes}>
                                 <img src={lapis} alt="Editar" onClick={() => abrirModalEdicao(disc)} />
                                 <img src={lixeira} alt="Excluir" onClick={() => handleDelete(disc.id)} />
                             </div>
                         )}
+                        
                     </div>
                 ))}
             </div>

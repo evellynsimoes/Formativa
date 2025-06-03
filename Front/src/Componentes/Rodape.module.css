@@ -25,26 +25,6 @@
     color: white;
 }
 
-.links {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 0;
-    margin: 20px 0;
-}
-
-.links li{
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.links li:hover {
-    color: #ffffff;
-    transition: color 0.3s ease-in-out;
-}
-
 .direitos {
     font-size: 12px;
     opacity: 0.8;
