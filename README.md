@@ -30,17 +30,17 @@ pip freeze > requirements.txt
 .\env\Scripts\activate
 cd Formativa
 python manage.py runserver
-🖥️ Front-end
-Abra outro terminal no VSCode;
+```
 
-Execute os comandos abaixo:
+## 🖥️ Front-end
+1. Abra outro terminal no VSCode;
+2. Execute os comandos abaixo:
 
-bash
-Copiar
-Editar
+```bash
 cd Front
 npm i
 npm run dev
+```
 ⚠️ Atenção:
 O token expira após 1 hora, restringindo as funcionalidades do projeto.
 
