@@ -34,13 +34,22 @@ export function ConteudoProfessores() {
     const fetchProfessores = async () => {
         try {
             const token = localStorage.getItem('token');
+            const role = localStorage.getItem('userRole');
+            const username = localStorage.getItem('username');
             const response = await axios.get(API_URL, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-            setProfessores(response.data);
+
+            let dados = response.data;
+
+            if (role === 'P'){
+                dados = dados.filter(prof => prof.username === username);
+            }
+
+            setProfessores(dados);
         } catch (error) {
             console.error('Erro ao buscar professores:', error);
         }
@@ -54,6 +63,36 @@ export function ConteudoProfessores() {
 
         if (!novoProfessor.nome || !novoProfessor.username || !novoProfessor.NI || (!editando && !novoProfessor.password)) {
             alert('Preencha todos os campos obrigatórios');
+            return;
+        }
+
+        if (novoProfessor.data_nascimento) {
+            const hoje = new Date();
+            const nascimento = new Date(novoProfessor.data_nascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mesDif = hoje.getMonth() - nascimento.getMonth();
+            if (mesDif < 0 || (mesDif === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            if (idade < 18) {
+                alert('O professor deve ter 18 anos.');
+                return;
+            }
+        }
+
+        if (novoProfessor.data_contratacao) {
+            const hoje = new Date();
+            const contratacao = new Date(novoProfessor.data_contratacao);
+            hoje.setHours(0,0,0,0); //Remove as horas da data de hoje para comparar apenas datas
+            contratacao.setHours(0,0,0,0);//Remove as horas da data de hoje para comparar apenas datas
+            if (contratacao >= hoje){
+                alert('A data de contratação deve ser anterior ao dia de hoje');
+                return;
+            }
+        }
+        
+        if (novoProfessor.NI === '0' || novoProfessor.NI === 0){
+            alert('Número de identificação (NI) não pode ser 0');
             return;
         }
 
@@ -118,7 +157,12 @@ export function ConteudoProfessores() {
             await fetchProfessores();
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            alert('Erro ao salvar professor: ' + (error.response?.data?.message || error.message));
+            
+            if (error.response?.status === 400 && error.response?.data?.NI) {
+                alert('Erro: Esse número de identificação (NI) já está em uso')
+            } else{
+                alert('Erro ao salvar professor: ' + (error.response?.data?.message || error.message));
+            }
         } finally {
             setIsLoading(false);
         }

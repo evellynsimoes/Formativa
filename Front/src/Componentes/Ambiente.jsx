@@ -83,18 +83,43 @@ export function ConteudoAmbiente() {
             const response = await axios.get('http://localhost:8000/api/professores/', {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setProfessores(response.data);
+            const apenasProfessores = response.data.filter(p => p.escolha === 'P');
+    
+            setProfessores(apenasProfessores);
         } catch (error) {
             console.error('Erro ao buscar professores:', error);
         }
     };
+    
+    
 
     const handleSalvar = async () => {
+        const hoje = new Date();
+
         const { data_inicio, data_termino, escolha, disciplina, professor, sala_reservada } = novaReserva;
         if (!data_inicio || !data_termino || !escolha || !disciplina || !sala_reservada || !professor) {
             alert('Preencha todos os campos obrigatórios');
             return;
         }
+
+        const dataInicioObj = new Date(data_inicio);
+        const dataTerminoObj = new Date(data_termino);
+
+        if (dataInicioObj < hoje) {
+            alert('A data de início não pode ser anterior a de hoje');
+            return;
+        }
+
+        if (dataTerminoObj < hoje) {
+            alert('A data de término não pode ser anterior a de hoje');
+            return;
+        }
+
+        if (dataTerminoObj <= dataInicioObj) {
+            alert('A data de término deve ser maior que a data de início');
+            return;
+        }
+
 
         setIsLoading(true);
         setError(null);
@@ -262,10 +287,10 @@ export function ConteudoAmbiente() {
                         </select>
 
                         <div className={estilo.botoes}>
-                            <button onClick={handleSalvar} disabled={isLoading}>
+                            <button onClick={handleSalvar} disabled={isLoading} type="submit" className={estilo.cadastrar}>
                                 {isLoading ? 'Salvando...' : (editando ? 'Salvar alterações' : 'Cadastrar')}
                             </button>
-                            <button onClick={() => setVisible(false)}>Fechar</button>
+                            <button onClick={() => setVisible(false)} type="submit" className={estilo.fechar}>Fechar</button>
                         </div>
                     </div>
                 </div>

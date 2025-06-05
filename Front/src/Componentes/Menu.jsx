@@ -5,8 +5,16 @@ import ambiente from '../assets/ambiente.png'
 import sala from '../assets/sala.png'
 import boss from '../assets/boss.png'
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 
 export function Menu(){
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const role = localStorage.getItem('userRole')
+        setUserRole(role);
+    }, []);
+
     return(
         <div className={estilo.conteiner}>
             <table>
@@ -18,12 +26,15 @@ export function Menu(){
                             
                         </div>
                     </td>
-                    <td>
-                        <div className={estilo.item}>
-                            <img src={boss} alt="Ícone de chefe" className={estilo.icone}/>
-                            <Link to="/gestores" style={{ textDecoration: 'none',  color: 'inherit' }}>Gestores</Link>
-                        </div>
-                    </td>
+
+                    {userRole === 'G' && (
+                        <td>
+                            <div className={estilo.item}>
+                                <img src={boss} alt="Ícone de chefe" className={estilo.icone}/>
+                                <Link to="/gestores" style={{ textDecoration: 'none',  color: 'inherit' }}>Gestores</Link>
+                            </div>
+                        </td>
+                    )}
                 </tr>
                 <tr>
                     <td>

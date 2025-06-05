@@ -23,7 +23,6 @@ export function ConteudoDisciplina() {
     const [idEditando, setIdEditando] = useState(null);
     const [isGestor, setIsGestor] = useState(false);
 
-
     useEffect(() => {
         const role = localStorage.getItem('userRole');
         setIsGestor(role === 'G');
@@ -36,9 +35,8 @@ export function ConteudoDisciplina() {
         setError(null);
         try {
             const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('Token não encontrado');
-            }
+            const role = localStorage.getItem('userRole');
+            const username = localStorage.getItem('username');
 
             const response = await axios.get(API_URL, {
                 headers: {
@@ -47,8 +45,26 @@ export function ConteudoDisciplina() {
                 }
             });
 
-            console.log("DADOS RECEBIDOS:", response.data);
-            setDisciplinas(response.data);
+            let disciplinasRecebidas = response.data;
+
+            if (role === 'P') {
+                const profResponse = await axios.get('http://localhost:8000/api/professores/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const profLogado = profResponse.data.find(p => p.username === username);
+
+                if (profLogado) {
+                    disciplinasRecebidas = disciplinasRecebidas.filter(d => d.professor === profLogado.id);
+                } else {
+                    disciplinasRecebidas = [];
+                }
+            }
+
+            setDisciplinas(disciplinasRecebidas);
         } catch (error) {
             console.error('Erro ao buscar disciplinas:', error);
             setError('Erro ao carregar disciplinas');
@@ -66,15 +82,14 @@ export function ConteudoDisciplina() {
                     'Content-Type': 'application/json'
                 }
             });
-            setProfessores(response.data);
+            const apenasProfessores = response.data.filter(p => p.escolha === 'P');
+            setProfessores(apenasProfessores);
         } catch (error) {
             console.error('Erro ao buscar professores:', error);
         }
     };
 
-
     const handleSalvar = async () => {
-
         if (!novaDisciplina.nome || !novaDisciplina.curso || (!editando && !novaDisciplina.professor)) {
             alert('Preencha todos os campos obrigatórios');
             return;
@@ -94,7 +109,7 @@ export function ConteudoDisciplina() {
                         'Content-Type': 'application/json'
                     }
                 });
-                alert('Disciplina atualizado com sucesso!');
+                alert('Disciplina atualizada com sucesso!');
             } else {
                 await axios.post(API_URL, novaDisciplina, {
                     headers: {
@@ -124,7 +139,6 @@ export function ConteudoDisciplina() {
             setIsLoading(false);
         }
     };
-
 
     const handleDelete = async (id) => {
         if (!window.confirm('Tem certeza que deseja excluir esta disciplina?')) {
@@ -167,7 +181,7 @@ export function ConteudoDisciplina() {
         setIdEditando(disciplina.id);
         setEditando(true);
         setVisible(true);
-    }
+    };
 
     const handleEditar = async (id) => {
         try {
@@ -237,7 +251,7 @@ export function ConteudoDisciplina() {
             {visible && (
                 <div className={estilo.modal}>
                     <div className={estilo.modalContent}>
-                        <h2>Cadastrar Disciplina</h2>
+                        <h2>{editando ? 'Editar Disciplina' : 'Cadastrar Disciplina'}</h2>
                         <input
                             type="text"
                             placeholder="Nome*"
@@ -262,7 +276,7 @@ export function ConteudoDisciplina() {
 
                         <input
                             type="text"
-                            placeholder="Descricao"
+                            placeholder="Descrição"
                             value={novaDisciplina.descricao}
                             onChange={(e) => setNovaDisciplina({ ...novaDisciplina, descricao: e.target.value })}
                             disabled={isLoading}
@@ -270,7 +284,7 @@ export function ConteudoDisciplina() {
                         <select
                             value={novaDisciplina.professor}
                             onChange={(e) => setNovaDisciplina({ ...novaDisciplina, professor: e.target.value })}
-                            disabled={isLoading}
+                            disabled={isLoading || editando} 
                         >
                             <option value="">Selecione um professor</option>
                             {professores.map(prof => (
@@ -279,7 +293,6 @@ export function ConteudoDisciplina() {
                                 </option>
                             ))}
                         </select>
-
 
                         <div className={estilo.botoes}>
                             <button
@@ -311,21 +324,20 @@ export function ConteudoDisciplina() {
                         </div>
                     </div>
                 </div>
-
-
             )}
 
             <div className={estilo.cardContainer}>
                 {disciplinas.map((disc) => (
                     <div key={disc.id} className={estilo.card}>
-                        
                         <div className={estilo.inf}>
                             <h3>{disc.nome}</h3>
 
                             <p><strong>Curso:</strong> {disc.curso}</p>
                             <p><strong>Carga Horária:</strong> {disc.carga_horaria}</p>
                             <p><strong>Descrição:</strong> {disc.descricao}</p>
-                            <p><strong>Professor:</strong> {disc.professor}</p>
+                            <p><strong>Professor:</strong>{
+                                professores.find(p => p.id === disc.professor)?.nome || 'Desconhecido'
+                            }</p>
                         </div>
 
                         {isGestor && (
@@ -334,12 +346,9 @@ export function ConteudoDisciplina() {
                                 <img src={lixeira} alt="Excluir" onClick={() => handleDelete(disc.id)} />
                             </div>
                         )}
-                        
                     </div>
                 ))}
             </div>
-
-
         </main>
     );
 }

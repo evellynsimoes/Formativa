@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator,MinValueValidator
 from django.core.exceptions import ValidationError
+from datetime import date
+from django.utils import timezone
 
 
 class Usuario(AbstractUser):
@@ -10,7 +12,7 @@ class Usuario(AbstractUser):
         ('G', 'Gestores')
     )
     escolha = models.CharField(max_length=20, choices=escolha_profissao)
-    NI = models.IntegerField(null=True, blank=True)
+    NI = models.IntegerField(null=True, blank=True, unique=True)
     nome = models.CharField(max_length=15)
 
     validador_telefone = RegexValidator(
@@ -23,6 +25,24 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return self.nome
+    
+    def clean(self):
+        super().clean()
+
+        # Validando a data de nascimento que tem que ser maior de 18 anos
+        if self.data_nascimento:
+            hoje = date.today()
+            idade = hoje.year - self.data_nascimento.year - (
+                (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)
+            )
+            if idade < 18:
+                raise ValidationError({'data_nascimento': 'O professor deve ser maior de 18 anos'})
+            
+        #Validando a data de contratação que tem que ser antes do dia atual
+        if self.data_contratacao:
+            if self.data_contratacao >= date.today():
+                raise ValidationError({'data_contratacao':'A data de contratação deve ser antes de hoje'})
+
 
 
 class Disciplinas(models.Model):
@@ -59,5 +79,23 @@ class ReservaAmbiente(models.Model):
     sala_reservada = models.ForeignKey(Sala, on_delete=models.CASCADE)
     disciplina = models.ForeignKey(Disciplinas, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, limit_choices_to={"escolha": "P"})
+
+    def clean(self):
+        super().clean()
+
+        agora = timezone.now()
+
+        if self.data_inicio:
+            if self.data_inicio < agora:
+                raise ValidationError({'data_inicio': 'A data e hora de início não podem ser anteriores ao momento atual.'})
+
+        if self.data_termino:
+            if self.data_termino < agora:
+                raise ValidationError({'data_termino': 'A data e hora de término não podem ser anteriores ao momento atual.'})
+
+        if self.data_inicio and self.data_termino:
+            if self.data_termino <= self.data_inicio:
+                raise ValidationError({'data_termino': 'A data e hora de término devem ser maiores que a data e hora de início.'})
+
 
     
