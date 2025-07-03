@@ -16,7 +16,7 @@ class Usuario(AbstractUser):
     nome = models.CharField(max_length=15)
 
     validador_telefone = RegexValidator(
-        regex='^\(\d{2}\)\d{5}[-]\d{4}$',
+        regex=r'^\(\d{2}\)\d{5}[-]\d{4}$',
         message='O telefone deve ser no formarto (xx)xxxxx-xxxx'
     )
     telefone = models.CharField(max_length=20, validators=[validador_telefone], unique=True)
